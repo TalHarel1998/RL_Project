@@ -125,6 +125,8 @@ def dqn_learing(
     ######
 
     # YOUR CODE HERE
+    Q        = q_func(input_arg, num_actions)
+    target_Q = q_func(input_arg, num_actions)
 
     ######
 
@@ -181,6 +183,14 @@ def dqn_learing(
         #####
 
         # YOUR CODE HERE
+
+        # Steps the environment forward one step
+        action = select_epilson_greedy_action(Q, last_obs, t)
+        obs, reward, done, info = env.step(action)
+
+        encoded_obs = replay_buffer.encode_recent_observation()
+        num_of_frames = replay_buffer.frame_history_len
+        stored_idx = replay_buffer.store_frame(encoded_obs[:,:,(num_of_frames-1)*3:])
 
         #####
 
