@@ -188,10 +188,13 @@ def dqn_learing(
         action = select_epilson_greedy_action(Q, last_obs, t)
         obs, reward, done, info = env.step(action)
 
+        # Stors and updates replay_buffer's variables due the latest observation
+        stored_idx  = replay_buffer.store_frame(last_obs)
+        # TODO: do we need the encoded_obs? maybe we'll have to use it during the learning process / 
         encoded_obs = replay_buffer.encode_recent_observation()
-        num_of_frames = replay_buffer.frame_history_len
-        stored_idx = replay_buffer.store_frame(encoded_obs[:,:,(num_of_frames-1)*3:])
+        replay_buffer.store_effect(stored_idx, action, reward, done)
 
+        last_obs = obs
         #####
 
         # at this point, the environment should have been advanced one step (and
