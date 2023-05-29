@@ -244,19 +244,31 @@ def dqn_learing(
             # YOUR CODE HERE
 
             # sample & "preprocess" batch
-            obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = reply_buffer.sample(batch_size)
-            obs_batch, next_obs_batch = Variable(obs_batch), Variable(next_obs_batch)
+            obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = replay_buffer.sample(batch_size)
+            obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = \
+                Variable(torch.from_numpy(obs_batch).type(dtype) / 225.0), \
+                Variable(torch.from_numpy(act_batch).type(torch.int64)), \
+                Variable(torch.from_numpy(rew_batch).type(dtype)), \
+                Variable(torch.from_numpy(next_obs_batch).type(dtype) / 255.0), \
+                Variable(torch.from_numpy(1 - done_mask))
 
             # compute bellman error
-            Q_next = model(next_obs_batch).data.max(1)[0]
+            Q_current = Q(obs_batch)
+
+            # if model does not learn - make sure this chooses the right indices and right values !
+            Q_current_copy = Q_current.gather(1, act_batch.unsqueeze(1)) 
+            Q_current_copy = torch.detach(Q_current_copy.squeeze(1))
+            
+            Q_next = Q(next_obs_batch).data.max(1)[0]
             Q_next = Q_next * done_mask # if obs.done=True, Q_next is obviously zero 
-            bellman_error = rew_batch + gamma * Q_next - Q(obs_batch)
+
+            bellman_error = rew_batch + gamma * Q_next - Q_current_copy
+            # bellman_error = torch.sum(bellman_error)
             bellman_error = np.clip(bellman_error, -1, 1) * -1
-            bellman_error = torch.sum(bellman_error)
 
             # make an optimization step
             optimizer.zero_grad()
-            bellman_error.backward()
+            Q_current_copy.backward(bellman_error.data.unsqueeze(0))
             optimizer.step()
 
             if (num_param_updates % target_update_freq) == 0:
