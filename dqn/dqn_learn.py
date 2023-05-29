@@ -184,15 +184,20 @@ def dqn_learing(
 
         # YOUR CODE HERE
 
-        # Steps the environment forward one step
-        action = select_epilson_greedy_action(Q, np.moveaxis(last_obs, -1, 0), t)
-        obs, reward, done, info = env.step(action)
-
-        # Stors and updates replay_buffer's variables due the latest observation
+        # Stores and updates replay_buffer's variables due the latest observation
         stored_idx  = replay_buffer.store_frame(last_obs)
-        # TODO: do we need the encoded_obs? maybe we'll have to use it during the learning process / 
+
         if t > 0:
             encoded_obs = replay_buffer.encode_recent_observation()
+        else:
+            encoded_obs = np.concatenate((last_obs, last_obs, last_obs, last_obs), 2)
+            encoded_obs = np.moveaxis(encoded_obs, -1, 0)
+
+        # Steps the environment forward one step
+        action = select_epilson_greedy_action(Q, encoded_obs, t)
+        obs, reward, done, info = env.step(action)
+
+        # Store current action & reward 
         replay_buffer.store_effect(stored_idx, action, reward, done)
 
         if done:
