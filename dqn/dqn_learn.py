@@ -127,6 +127,7 @@ def dqn_learing(
     # YOUR CODE HERE
     Q        = q_func(input_arg, num_actions)
     target_Q = q_func(input_arg, num_actions)
+    target_Q.load_state_dict(Q.state_dict())
 
     ######
 
@@ -256,19 +257,19 @@ def dqn_learing(
             Q_current = Q(obs_batch)
 
             # if model does not learn - make sure this chooses the right indices and right values !
-            Q_current_copy = Q_current.gather(1, act_batch.unsqueeze(1)) 
-            Q_current_copy = torch.detach(Q_current_copy.squeeze(1))
+            Q_current_copy = Q_current.gather(1, act_batch.unsqueeze(1)).squeeze(1)
+            # Q_current_copy = torch.detach(Q_current_copy.squeeze(1))
             
-            Q_next = Q(next_obs_batch).data.max(1)[0]
+            Q_next = target_Q(next_obs_batch).data.max(1)[0]    # TODO: figure out why target_Q and not Q
             Q_next = Q_next * done_mask # if obs.done=True, Q_next is obviously zero 
 
             bellman_error = rew_batch + gamma * Q_next - Q_current_copy
             # bellman_error = torch.sum(bellman_error)
-            bellman_error = np.clip(bellman_error, -1, 1) * -1
+            bellman_error = torch.clip(bellman_error, -1, 1) * -1
 
             # make an optimization step
             optimizer.zero_grad()
-            Q_current_copy.backward(bellman_error.data.unsqueeze(0))
+            Q_current_copy.backward(bellman_error.data)
             optimizer.step()
 
             if (num_param_updates % target_update_freq) == 0:
