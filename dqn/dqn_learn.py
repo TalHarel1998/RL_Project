@@ -150,7 +150,7 @@ def dqn_learing(
         ### 1. Check stopping criterion
         if stopping_criterion is not None and stopping_criterion(env):
             break
-
+        
         ### 2. Step the env and store the transition
         # At this point, "last_obs" contains the latest observation that was
         # recorded from the simulator. Here, your code needs to store this
@@ -194,7 +194,11 @@ def dqn_learing(
         encoded_obs = replay_buffer.encode_recent_observation()
         replay_buffer.store_effect(stored_idx, action, reward, done)
 
-        last_obs = obs
+        if done:
+            last_obs = env.reset()
+        else:
+            last_obs = obs
+
         #####
 
         # at this point, the environment should have been advanced one step (and
