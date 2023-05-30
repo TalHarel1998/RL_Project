@@ -58,4 +58,4 @@ if __name__ == '__main__':
     env = get_env(task, seed)
 
     # main(env, task.max_timesteps)
-    main(env, 6000000)
+    main(env, 25000000)
