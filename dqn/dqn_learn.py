@@ -129,6 +129,9 @@ def dqn_learing(
     target_Q = q_func(input_arg, num_actions)
     target_Q.load_state_dict(Q.state_dict())
 
+    if USE_CUDA:
+        Q, target_Q = Q.cuda(), target_Q.cuda()
+
     ######
 
 
@@ -252,6 +255,9 @@ def dqn_learing(
                 Variable(torch.from_numpy(rew_batch).type(dtype)), \
                 Variable(torch.from_numpy(next_obs_batch).type(dtype) / 255.0), \
                 Variable(torch.from_numpy(1 - done_mask))
+
+            if USE_CUDA:
+                act_batch, rew_batch, done_mask = act_batch.cuda(), rew_batch.cuda(), done_mask.cuda()
 
             # compute bellman error
             Q_current = Q(obs_batch)
