@@ -247,7 +247,7 @@ def dqn_learing(
             # sample & "preprocess" batch
             obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = replay_buffer.sample(batch_size)
             obs_batch, act_batch, rew_batch, next_obs_batch, done_mask = \
-                Variable(torch.from_numpy(obs_batch).type(dtype) / 225.0), \
+                Variable(torch.from_numpy(obs_batch).type(dtype) / 255.0), \
                 Variable(torch.from_numpy(act_batch).type(torch.int64)), \
                 Variable(torch.from_numpy(rew_batch).type(dtype)), \
                 Variable(torch.from_numpy(next_obs_batch).type(dtype) / 255.0), \
