@@ -35,7 +35,9 @@ OptimizerSpec = namedtuple("OptimizerSpec", ["constructor", "kwargs"])
 
 Statistic = {
     "mean_episode_rewards": [],
-    "best_mean_episode_rewards": []
+    "best_mean_episode_rewards": [],
+    "max_episode_rewards": [],
+    "best_max_episode_rewards": []
 }
 
 def dqn_learing(
@@ -147,6 +149,8 @@ def dqn_learing(
     num_param_updates = 0
     mean_episode_reward = -float('nan')
     best_mean_episode_reward = -float('inf')
+    max_episode_reward = -float('nan')
+    best_max_episode_reward = -float('inf')
     last_obs = env.reset()
     LOG_EVERY_N_STEPS = 10000
 
@@ -289,16 +293,22 @@ def dqn_learing(
         episode_rewards = get_wrapper_by_name(env, "Monitor").get_episode_rewards()
         if len(episode_rewards) > 0:
             mean_episode_reward = np.mean(episode_rewards[-100:])
+            max_episode_reward  = np.max(episode_rewards[-10:])
         if len(episode_rewards) > 100:
             best_mean_episode_reward = max(best_mean_episode_reward, mean_episode_reward)
+            best_max_episode_reward  = max(best_max_episode_reward,  max_episode_reward)
 
         Statistic["mean_episode_rewards"].append(mean_episode_reward)
         Statistic["best_mean_episode_rewards"].append(best_mean_episode_reward)
+        Statistic["max_episode_rewards"].append(mean_episode_reward)
+        Statistic["best_max_episode_rewards"].append(best_mean_episode_reward)
 
         if t % LOG_EVERY_N_STEPS == 0 and t > learning_starts:
             print("Timestep %d" % (t,))
             print("mean reward (100 episodes) %f" % mean_episode_reward)
             print("best mean reward %f" % best_mean_episode_reward)
+            print("max reward (100 episodes) %f" % max_episode_reward)
+            print("best max reward %f" % best_max_episode_reward)
             print("episodes %d" % len(episode_rewards))
             print("exploration %f" % exploration.value(t))
             sys.stdout.flush()
