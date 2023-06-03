@@ -60,7 +60,7 @@ if __name__ == '__main__':
     env = get_env(task, seed)
 
     # main(env, task.max_timesteps)
-    if (len(sys.argv) == 1:
+    if (len(sys.argv)) == 1:
         main(env, 25000000)
     else:
-        main(env, 25000000, gamma=float(sys.argv[1]))
+        main(env, 10000, gamma=float(sys.argv[1]))
