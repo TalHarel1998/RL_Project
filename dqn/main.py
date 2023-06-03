@@ -63,4 +63,4 @@ if __name__ == '__main__':
     if (len(sys.argv)) == 1:
         main(env, 25000000)
     else:
-        main(env, 10000, gamma=float(sys.argv[1]))
+        main(env, 25000000, gamma=float(sys.argv[1]))
