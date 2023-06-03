@@ -6,6 +6,8 @@ from dqn_learn import OptimizerSpec, dqn_learing
 from utils.gym import get_env, get_wrapper_by_name
 from utils.schedule import LinearSchedule
 
+import sys
+
 BATCH_SIZE = 32
 GAMMA = 0.99
 REPLAY_BUFFER_SIZE = 1000000
@@ -17,7 +19,7 @@ LEARNING_RATE = 0.00025
 ALPHA = 0.95
 EPS = 0.01
 
-def main(env, num_timesteps):
+def main(env, num_timesteps, gamma=GAMMA):
 
     def stopping_criterion(env):
         # notice that here t is the number of steps of the wrapped env,
@@ -39,7 +41,7 @@ def main(env, num_timesteps):
         stopping_criterion=stopping_criterion,
         replay_buffer_size=REPLAY_BUFFER_SIZE,
         batch_size=BATCH_SIZE,
-        gamma=GAMMA,
+        gamma=gamma,
         learning_starts=LEARNING_STARTS,
         learning_freq=LEARNING_FREQ,
         frame_history_len=FRAME_HISTORY_LEN,
@@ -58,4 +60,7 @@ if __name__ == '__main__':
     env = get_env(task, seed)
 
     # main(env, task.max_timesteps)
-    main(env, 25000000)
+    if (len(sys.argv) == 1:
+        main(env, 25000000)
+    else:
+        main(env, 25000000, gamma=float(sys.argv[1]))
