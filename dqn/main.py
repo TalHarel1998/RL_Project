@@ -61,6 +61,6 @@ if __name__ == '__main__':
 
     # main(env, task.max_timesteps)
     if (len(sys.argv)) == 1:
-        main(env, 25000000)
+        main(env, 21000000)
     else:
-        main(env, 25000000, gamma=float(sys.argv[1]))
+        main(env, 21000000, gamma=float(sys.argv[1]))
